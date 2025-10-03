@@ -1,0 +1,267 @@
+/* animations-extra.css — Animaciones y efectos adicionales opcionales */
+
+/* Partículas flotantes de corazones en el hero */
+.hero::after {
+    content: '❤️';
+    position: absolute;
+    font-size: 2rem;
+    opacity: 0;
+    animation: floatingHearts 15s infinite;
+    pointer-events: none;
+}
+
+@keyframes floatingHearts {
+    0% {
+        bottom: -50px;
+        left: 10%;
+        opacity: 0;
+        transform: translateX(0) rotate(0deg);
+    }
+    10% {
+        opacity: 0.6;
+    }
+    90% {
+        opacity: 0.6;
+    }
+    100% {
+        bottom: 100%;
+        left: 20%;
+        opacity: 0;
+        transform: translateX(100px) rotate(360deg);
+    }
+}
+
+/* Efecto de brillo en el título del hero */
+.hero__title {
+    background: linear-gradient(
+        90deg,
+        white 0%,
+        white 40%,
+        rgba(255, 255, 255, 0.8) 50%,
+        white 60%,
+        white 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: shine 3s linear infinite;
+}
+
+@keyframes shine {
+    to {
+        background-position: 200% center;
+    }
+}
+
+/* Efecto parallax suave en las imágenes del timeline */
+@media (min-width: 769px) {
+    .timeline__media {
+        transition: transform 0.3s ease-out;
+    }
+    
+    .timeline__item:hover .timeline__media {
+        transform: scale(1.05) translateZ(0);
+    }
+}
+
+/* Indicador de scroll */
+.scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 50px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 25px;
+    display: flex;
+    justify-content: center;
+    padding-top: 8px;
+    animation: fadeInUp 1s ease-out 1s backwards;
+}
+
+.scroll-indicator::before {
+    content: '';
+    width: 4px;
+    height: 8px;
+    background: white;
+    border-radius: 2px;
+    animation: scrollDown 2s infinite;
+}
+
+@keyframes scrollDown {
+    0%, 100% {
+        transform: translateY(0);
+        opacity: 0;
+    }
+    50% {
+        transform: translateY(15px);
+        opacity: 1;
+    }
+}
+
+/* Efecto de escritura para el tagline (opcional) */
+.hero__tagline.typing {
+    overflow: hidden;
+    border-right: 2px solid white;
+    white-space: nowrap;
+    animation: 
+        typing 3s steps(20, end) forwards,
+        blink 0.75s step-end infinite;
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+@keyframes blink {
+    50% { border-color: transparent; }
+}
+
+/* Efecto de onda en los botones */
+.btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* Sombras animadas en las cards */
+@media (min-width: 769px) {
+    .counter__unit,
+    .timeline__media,
+    .vows__card,
+    .gallery__item {
+        transition: 
+            transform 0.3s ease-out,
+            box-shadow 0.3s ease-out;
+    }
+    
+    .counter__unit:hover,
+    .vows__card:hover {
+        box-shadow: 
+            0 15px 35px rgba(233, 30, 99, 0.2),
+            0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* Animación de entrada escalonada para el contador */
+.counter__unit:nth-child(1) { animation-delay: 0.4s; }
+.counter__unit:nth-child(2) { animation-delay: 0.5s; }
+.counter__unit:nth-child(3) { animation-delay: 0.6s; }
+.counter__unit:nth-child(4) { animation-delay: 0.7s; }
+
+/* Efecto de revelación en las secciones */
+.section {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: sectionReveal 0.8s ease-out forwards;
+}
+
+.section:nth-of-type(1) { animation-delay: 0.2s; }
+.section:nth-of-type(2) { animation-delay: 0.4s; }
+.section:nth-of-type(3) { animation-delay: 0.6s; }
+
+@keyframes sectionReveal {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Barra de progreso de scroll */
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+    z-index: 9998;
+    transition: width 0.1s ease-out;
+}
+
+/* Cursor personalizado (opcional - solo desktop) */
+@media (min-width: 1024px) and (hover: hover) {
+    body.custom-cursor {
+        cursor: none;
+    }
+    
+    .custom-cursor-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--color-primary);
+        border-radius: 50%;
+        position: fixed;
+        pointer-events: none;
+        z-index: 99999;
+        transition: transform 0.15s ease-out;
+    }
+    
+    body.custom-cursor a:hover ~ .custom-cursor-dot,
+    body.custom-cursor button:hover ~ .custom-cursor-dot {
+        transform: scale(3);
+        background: var(--color-accent);
+    }
+}
+
+/* Efecto de vidrio/glassmorphism mejorado */
+.glass-effect {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Modo oscuro - transiciones suaves */
+@media (prefers-color-scheme: dark) {
+    * {
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+}
+
+/* Animación de carga inicial */
+@keyframes pageLoad {
+    from {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+body {
+    animation: pageLoad 0.6s ease-out;
+}
+
+/* Mejora visual para focus (accesibilidad) */
+.btn:focus-visible,
+.timeline__media:focus-visible,
+.gallery__item:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 4px;
+    box-shadow: 0 0 0 6px rgba(233, 30, 99, 0.2);
+}
+
+/* Transición suave entre secciones */
+.section {
+    scroll-margin-top: 2rem;
+}

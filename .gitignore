@@ -1,0 +1,28 @@
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Archivos temporales
+*.tmp
+*.log
+
+# Node modules (si usas npm)
+node_modules/
+
+# Archivos personales (opcional - descomenta si no quieres subir tus fotos)
+# assets/img/*.jpg
+# assets/img/*.png
+# assets/img/*.jpeg
+
+# Build y cache
+.cache/
+dist/
+build/
