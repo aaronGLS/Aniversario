@@ -14,40 +14,54 @@ export function renderTimeline({ items, mount }) {
     items.forEach((it, idx) => {
         const li = document.createElement('li');
         li.className = 'timeline__item';
-        li.style.transitionDelay = `${idx * 0.1}s`;
         li.setAttribute('data-index', idx);
         
-        li.innerHTML = `
-<div class="timeline__media" role="button" tabindex="0" aria-label="Ver imagen: ${it.title}">
-<picture>
-<img src="${it.img}" alt="${it.alt || it.title || 'Momento especial'}" loading="lazy" decoding="async" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23ffd1dc%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23e91e63%22 font-family=%22sans-serif%22 font-size=%2220%22%3E%E2%9D%A4%EF%B8%8F%3C/text%3E%3C/svg%3E'" />
-</picture>
-</div>
-<div class="timeline__content">
-<time class="timeline__meta" datetime="${it.date}">${formatDateISO(it.date)}</time>
-<h3 class="timeline__title">${it.title}</h3>
-<p class="timeline__text">${it.text}</p>
-</div>`;
+        // Crear estructura optimizada (solo imagen y fecha)
+        const media = document.createElement('div');
+        media.className = 'timeline__media';
+        media.setAttribute('role', 'button');
+        media.setAttribute('tabindex', '0');
+        media.setAttribute('aria-label', `Ver imagen: ${it.title}`);
+        
+        const picture = document.createElement('picture');
+        const img = document.createElement('img');
+        img.src = it.img;
+        img.alt = it.alt || it.title || 'Momento especial';
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.onerror = function() {
+            this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23ffd1dc' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23e91e63' font-family='sans-serif' font-size='20'%3E%E2%9D%A4%EF%B8%8F%3C/text%3E%3C/svg%3E";
+        };
+        picture.appendChild(img);
+        media.appendChild(picture);
+        
+        const content = document.createElement('div');
+        content.className = 'timeline__content';
+        
+        const time = document.createElement('time');
+        time.className = 'timeline__meta';
+        time.setAttribute('datetime', it.date);
+        time.textContent = formatDateISO(it.date);
+        
+        content.appendChild(time);
+        
+        // Guardamos title y text como data attributes por si se necesitan más tarde
+        li.dataset.title = it.title;
+        li.dataset.text = it.text;
+        
+        li.appendChild(media);
+        li.appendChild(content);
         frag.appendChild(li);
     });
+    
     mount.innerHTML = '';
     mount.appendChild(frag);
 
-
-    // Animación al entrar en viewport con mejor threshold
-    const io = new IntersectionObserver((entries, obs) => {
-        entries.forEach(e => {
-            if (e.isIntersecting) { 
-                e.target.classList.add('is-visible');
-                obs.unobserve(e.target);
-            }
-        });
-    }, { threshold: 0.3, rootMargin: '0px 0px -50px 0px' });
-    
-    qsa('.timeline__item', mount).forEach(el => io.observe(el));
-    
     // Hacer las imágenes clickeables para abrir en lightbox
     setupTimelineImageClick(mount);
+    
+    // NOTA: La animación de entrada se maneja en app.js con el observer global
+    // para evitar duplicación y mejorar performance
 }
 
 function setupTimelineImageClick(mount) {
@@ -60,56 +74,74 @@ function setupTimelineImageClick(mount) {
     
     if (!lightbox || !lightboxImg || !lightboxCaption) return;
     
-    // Ocultar controles de navegación para timeline (solo una imagen)
-    if (lightboxPrev) lightboxPrev.style.display = 'none';
-    if (lightboxNext) lightboxNext.style.display = 'none';
+    // Delegación de eventos para mejor rendimiento
+    mount.addEventListener('click', (e) => {
+        const media = e.target.closest('.timeline__media');
+        if (media) openTimelineImage(media);
+    });
     
-    qsa('.timeline__media', mount).forEach(media => {
-        media.addEventListener('click', () => openTimelineImage(media));
-        media.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
+    mount.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            const media = e.target.closest('.timeline__media');
+            if (media) {
                 e.preventDefault();
                 openTimelineImage(media);
             }
-        });
+        }
     });
     
     function openTimelineImage(media) {
         const img = media.querySelector('img');
-        const content = media.closest('.timeline__item').querySelector('.timeline__content');
-        const title = content.querySelector('.timeline__title').textContent;
-        const date = content.querySelector('.timeline__meta').textContent;
+        const item = media.closest('.timeline__item');
+        const date = item.querySelector('.timeline__meta').textContent;
+        const title = item.dataset.title || '';
+        
+        // Ocultar controles de navegación (no se necesitan en timeline)
+        if (lightboxPrev) lightboxPrev.style.display = 'none';
+        if (lightboxNext) lightboxNext.style.display = 'none';
         
         lightboxImg.src = img.src;
         lightboxImg.alt = img.alt;
-        lightboxCaption.textContent = `${title} — ${date}`;
+        lightboxCaption.textContent = title ? `${title} — ${date}` : date;
         lightbox.hidden = false;
         
+        // Marcar que se abrió desde timeline
+        lightbox.dataset.source = 'timeline';
+        
         // Prevenir scroll al hacer focus
-        const scrollY = window.scrollY;
-        lightbox.focus({ preventScroll: true });
-        window.scrollTo(0, scrollY);
+        requestAnimationFrame(() => {
+            lightbox.focus({ preventScroll: true });
+        });
         
         // Bloquear scroll del body sin causar saltos
         document.body.style.overflow = 'hidden';
         document.body.style.paddingRight = `${window.innerWidth - document.documentElement.clientWidth}px`;
     }
     
-    // Restaurar controles y scroll cuando se cierre
-    if (lightboxClose) {
-        const closeHandler = () => {
-            if (lightboxPrev) lightboxPrev.style.display = '';
-            if (lightboxNext) lightboxNext.style.display = '';
-            document.body.style.overflow = '';
-            document.body.style.paddingRight = '';
-        };
-        lightboxClose.addEventListener('click', closeHandler);
+    // Manejar cierre del lightbox (solo agregamos si no existe ya)
+    if (!lightboxClose.dataset.timelineListenerAdded) {
+        lightboxClose.dataset.timelineListenerAdded = 'true';
         
-        // También manejar ESC
+        lightboxClose.addEventListener('click', handleTimelineClose);
+        
         lightbox.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                closeHandler();
+                handleTimelineClose();
             }
         });
+    }
+    
+    function handleTimelineClose() {
+        // Solo restaurar si se abrió desde timeline
+        if (lightbox.dataset.source === 'timeline') {
+            // Restaurar controles para la galería
+            if (lightboxPrev) lightboxPrev.style.display = '';
+            if (lightboxNext) lightboxNext.style.display = '';
+            delete lightbox.dataset.source;
+        }
+        
+        // Siempre desbloquear scroll
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
     }
 }

@@ -182,15 +182,11 @@
     }
 }
 
-/* Efecto de zoom suave con micro-interacción */
-@media (min-width: 769px) {
-    .timeline__item:hover .timeline__content {
-        transform: translateX(5px);
+/* Efecto suave en timeline__meta al hacer hover en el item */
+@media (min-width: 769px) and (hover: hover) {
+    .timeline__item:hover .timeline__meta {
+        transform: scale(1.05);
         transition: transform 0.3s ease-out;
-    }
-    
-    .timeline__item:nth-child(even):hover .timeline__content {
-        transform: translateX(-5px);
     }
 }
 
@@ -273,15 +269,14 @@
     height: 300px;
 }
 
-/* Sombras animadas en las cards */
-@media (min-width: 769px) {
+/* Sombras animadas en las cards - optimizado con hover: hover */
+@media (min-width: 769px) and (hover: hover) {
     .counter__unit,
-    .timeline__media,
     .vows__card,
     .gallery__item {
         transition: 
-            transform 0.3s ease-out,
-            box-shadow 0.3s ease-out;
+            transform 0.3s cubic-bezier(0.2, 0.9, 0.2, 1),
+            box-shadow 0.3s cubic-bezier(0.2, 0.9, 0.2, 1);
     }
     
     .counter__unit:hover,

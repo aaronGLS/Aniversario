@@ -2,8 +2,8 @@
 export const SITE = {
     meta: { annivLabel: '1er Aniversario' },
     couple: {
-        you: 'Alex',
-        partner: 'Sam',
+        you: 'Aaron',
+        partner: 'Emi',
         since: '2024-10-03', // YYYY-MM-DD — medianoche de Guatemala
         tagline: '365 días de nosotros 💘'
     },
