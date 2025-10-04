@@ -22,7 +22,6 @@
     .vows,
     .footer,
     .lightbox,
-    #confetti-canvas,
     .btn:not(#print-letter) {
         display: none !important;
     }

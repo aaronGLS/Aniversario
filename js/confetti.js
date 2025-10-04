@@ -1,191 +1,169 @@
-// Confeti mejorado (canvas) — respeta prefers-reduced-motion
+/**
+ * Confetti mejorado usando canvas-confetti
+ * Optimizado, robusto y con control de estado
+ * @see https://github.com/catdad/canvas-confetti
+ */
+
 import { prefersReducedMotion } from './utils.js';
 
+// Estado de la animación para prevenir múltiples ejecuciones
+let isAnimating = false;
+let animationTimeout = null;
 
-export function shootConfetti(canvas) {
-    if (!canvas || prefersReducedMotion()) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return; // Validar contexto
+// Colores temáticos del sitio
+const THEME_COLORS = [
+    '#e91e63', // Primary pink
+    '#f48fb1', // Light pink
+    '#ffd1dc', // Accent pink
+    '#ff4081', // Vibrant pink
+    '#ff80ab', // Soft pink
+    '#c2185b', // Dark pink
+    '#ffffff', // White
+];
+
+/**
+ * Lanza confeti con animación elegante
+ * Previene ejecuciones múltiples y respeta accesibilidad
+ */
+export async function shootConfetti() {
+    // Respetar preferencias de usuario
+    if (prefersReducedMotion()) {
+        console.log('Confetti deshabilitado: usuario prefiere movimiento reducido');
+        return;
+    }
     
-    // Hacer visible el canvas primero
-    canvas.classList.add('active');
+    // Prevenir múltiples ejecuciones simultáneas
+    if (isAnimating) {
+        console.log('Confetti ya en ejecución, ignorando click');
+        return;
+    }
     
-    // Ahora obtener las dimensiones correctas
-    const W = canvas.width = window.innerWidth;
-    const H = canvas.height = window.innerHeight;
-
-    // Colores temáticos del sitio
-    const colors = [
-        '#e91e63', // Primary pink
-        '#f48fb1', // Light pink
-        '#ffd1dc', // Accent pink
-        '#ff4081', // Vibrant pink
-        '#ff80ab', // Soft pink
-        '#c2185b', // Dark pink
-        '#ffffff', // White
-    ];
-
-    // Tipos de partículas
-    const shapes = ['circle', 'square', 'heart', 'star'];
-
-    const N = 150; // Más partículas
-    const parts = [];
+    // Verificar que canvas-confetti esté cargado
+    if (typeof confetti === 'undefined') {
+        console.error('canvas-confetti no está cargado');
+        return;
+    }
     
-    for (let i = 0; i < N; i++) {
-        parts.push({
-            x: Math.random() * W,
-            y: Math.random() * -H - 100, // Empiezan más arriba
-            r: 3 + Math.random() * 5, // Tamaño variable
-            vx: -2 + Math.random() * 4, // Velocidad horizontal más variada
-            vy: 1 + Math.random() * 3, // Velocidad vertical inicial
-            gravity: 0.15 + Math.random() * 0.1, // Gravedad realista
-            a: Math.random() * Math.PI * 2, // Ángulo inicial
-            rotationSpeed: -0.05 + Math.random() * 0.1, // Velocidad de rotación
-            opacity: 1, // Opacidad para fade-out
-            color: colors[Math.floor(Math.random() * colors.length)],
-            shape: shapes[Math.floor(Math.random() * shapes.length)],
-            wobble: Math.random() * 0.5, // Efecto de bamboleo
-            wobbleSpeed: 0.03 + Math.random() * 0.02
+    // Marcar como activo
+    isAnimating = true;
+    
+    try {
+        // Configuración base optimizada
+        const defaults = {
+            colors: THEME_COLORS,
+            disableForReducedMotion: true,
+            useWorker: true, // Usar Web Worker para mejor performance
+        };
+        
+        // Configurar instancia con defaults
+        const fire = confetti.create(undefined, {
+            resize: true, // Auto-resize en cambios de viewport
+            ...defaults
         });
+        
+        // 🎉 EFECTO 1: Explosión desde abajo (centro)
+        await fire({
+            particleCount: 200,
+            spread: 100,
+            origin: { x: 0.5, y: 1 }, // Centro-abajo
+            startVelocity: 60,
+            gravity: 1.2,
+            ticks: 200,
+            scalar: 1.2,
+            shapes: ['circle', 'square'],
+        });
+        
+        // 🎊 EFECTO 2: Lluvia lateral izquierda (delay 150ms)
+        await delay(150);
+        fire({
+            particleCount: 50,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0, y: 0.6 }, // Izquierda-medio
+            startVelocity: 45,
+            gravity: 1,
+            ticks: 180,
+            scalar: 0.9,
+        });
+        
+        // 🎊 EFECTO 3: Lluvia lateral derecha (delay 150ms)
+        await delay(150);
+        fire({
+            particleCount: 50,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1, y: 0.6 }, // Derecha-medio
+            startVelocity: 45,
+            gravity: 1,
+            ticks: 180,
+            scalar: 0.9,
+        });
+        
+        // 💖 EFECTO 4: Corazones flotantes (delay 200ms)
+        await delay(200);
+        fire({
+            particleCount: 30,
+            spread: 100,
+            origin: { x: 0.5, y: 0.9 },
+            startVelocity: 35,
+            gravity: 0.8,
+            ticks: 250,
+            scalar: 1.5,
+            shapes: ['heart'],
+            flat: false, // Partículas más planas (efecto 2D)
+        });
+        
+        // ✨ EFECTO 5: Estallido final central (delay 300ms)
+        await delay(300);
+        fire({
+            particleCount: 60,
+            spread: 360,
+            origin: { x: 0.5, y: 0.5 }, // Centro pantalla
+            startVelocity: 25,
+            gravity: 0.6,
+            ticks: 150,
+            scalar: 0.8,
+            decay: 0.9,
+        });
+        
+        // Esperar que todas las animaciones terminen (aproximadamente 3s)
+        animationTimeout = setTimeout(() => {
+            isAnimating = false;
+            console.log('Animación de confetti completada');
+        }, 3500);
+        
+    } catch (error) {
+        console.error('Error al ejecutar confetti:', error);
+        isAnimating = false;
     }
-
-    const DURATION = 4000; // 4 segundos total
-    const FADE_START = 3000; // Empieza a desaparecer a los 3s
-
-    let start = performance.now();
-    
-    function frame(t) {
-        const elapsed = t - start;
-        
-        if (elapsed > DURATION) {
-            // Limpiar el canvas completamente
-            ctx.clearRect(0, 0, W, H);
-            // Ocultar con fade-out suave del canvas
-            canvas.classList.remove('active');
-            return;
-        }
-        
-        // Limpiar frame anterior
-        ctx.clearRect(0, 0, W, H);
-        
-        // Calcular factor de fade-out para las partículas
-        let globalFade = 1;
-        if (elapsed > FADE_START) {
-            globalFade = 1 - (elapsed - FADE_START) / (DURATION - FADE_START);
-        }
-        
-        for (const p of parts) {
-            // Actualizar física
-            p.vy += p.gravity; // Aplicar gravedad
-            p.x += p.vx + Math.sin(elapsed * p.wobbleSpeed) * p.wobble; // Bamboleo
-            p.y += p.vy;
-            p.a += p.rotationSpeed;
-            
-            // Fade-out gradual
-            p.opacity = globalFade;
-            
-            // Si sale por abajo, reiniciar arriba (solo en los primeros 2.5s)
-            if (p.y > H + 50 && elapsed < 2500) {
-                p.y = -50;
-                p.x = Math.random() * W;
-                p.vy = 1 + Math.random() * 2;
-            }
-            
-            // Dibujar partícula
-            ctx.save();
-            ctx.translate(p.x, p.y);
-            ctx.rotate(p.a);
-            ctx.globalAlpha = p.opacity;
-            
-            // Dibujar según forma
-            switch(p.shape) {
-                case 'circle':
-                    ctx.fillStyle = p.color;
-                    ctx.beginPath();
-                    ctx.arc(0, 0, p.r, 0, Math.PI * 2);
-                    ctx.fill();
-                    break;
-                    
-                case 'square':
-                    ctx.fillStyle = p.color;
-                    ctx.fillRect(-p.r, -p.r, p.r * 2, p.r * 2);
-                    break;
-                    
-                case 'heart':
-                    ctx.fillStyle = p.color;
-                    drawHeart(ctx, 0, 0, p.r * 0.8);
-                    break;
-                    
-                case 'star':
-                    ctx.fillStyle = p.color;
-                    drawStar(ctx, 0, 0, 5, p.r, p.r * 0.5);
-                    break;
-            }
-            
-            ctx.restore();
-        }
-        
-        requestAnimationFrame(frame);
-    }
-    
-    requestAnimationFrame(frame);
 }
 
-// Función para dibujar corazón
-function drawHeart(ctx, x, y, size) {
-    ctx.beginPath();
-    const topCurveHeight = size * 0.3;
-    ctx.moveTo(x, y + topCurveHeight);
-    // Curva izquierda superior
-    ctx.bezierCurveTo(
-        x, y, 
-        x - size / 2, y, 
-        x - size / 2, y + topCurveHeight
-    );
-    // Curva izquierda inferior
-    ctx.bezierCurveTo(
-        x - size / 2, y + (size + topCurveHeight) / 2, 
-        x, y + (size + topCurveHeight) / 2, 
-        x, y + size
-    );
-    // Curva derecha inferior
-    ctx.bezierCurveTo(
-        x, y + (size + topCurveHeight) / 2, 
-        x + size / 2, y + (size + topCurveHeight) / 2, 
-        x + size / 2, y + topCurveHeight
-    );
-    // Curva derecha superior
-    ctx.bezierCurveTo(
-        x + size / 2, y, 
-        x, y, 
-        x, y + topCurveHeight
-    );
-    ctx.fill();
-}
-
-// Función para dibujar estrella
-function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius) {
-    let rot = Math.PI / 2 * 3;
-    let x = cx;
-    let y = cy;
-    const step = Math.PI / spikes;
-
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - outerRadius);
-    
-    for (let i = 0; i < spikes; i++) {
-        x = cx + Math.cos(rot) * outerRadius;
-        y = cy + Math.sin(rot) * outerRadius;
-        ctx.lineTo(x, y);
-        rot += step;
-
-        x = cx + Math.cos(rot) * innerRadius;
-        y = cy + Math.sin(rot) * innerRadius;
-        ctx.lineTo(x, y);
-        rot += step;
+/**
+ * Cancela la animación de confetti en progreso
+ */
+export function cancelConfetti() {
+    if (animationTimeout) {
+        clearTimeout(animationTimeout);
+        animationTimeout = null;
     }
     
-    ctx.lineTo(cx, cy - outerRadius);
-    ctx.closePath();
-    ctx.fill();
+    if (typeof confetti !== 'undefined') {
+        confetti.reset(); // Limpia todas las partículas
+    }
+    
+    isAnimating = false;
+}
+
+/**
+ * Helper para crear delays entre efectos
+ */
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Verifica si canvas-confetti está disponible
+ */
+export function isConfettiAvailable() {
+    return typeof confetti !== 'undefined';
 }

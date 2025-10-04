@@ -78,16 +78,27 @@ renderVows({ vows: SITE.vows, mount: qs('#vows') });
 // 9) Botón Empezar - scroll suave y confetti
 const btnStart = qs('#btn-start');
 const main = qs('#main');
-const confettiCanvas = qs('#confetti-canvas');
 
-on(btnStart, 'click', () => {
-    // Scroll suave a la sección principal
-    main.scrollIntoView({ behavior: 'smooth', block: 'start' });
+// Debounce para prevenir múltiples clicks
+let isScrolling = false;
+
+on(btnStart, 'click', async () => {
+    // Prevenir clicks múltiples durante scroll
+    if (isScrolling) return;
+    isScrolling = true;
     
-    // Lanzar confetti
-    if (confettiCanvas) {
-        shootConfetti(confettiCanvas);
-    }
+    // Lanzar confetti inmediatamente
+    shootConfetti();
+    
+    // Scroll suave después de un pequeño delay
+    setTimeout(() => {
+        main.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        // Resetear flag después del scroll (aproximadamente)
+        setTimeout(() => {
+            isScrolling = false;
+        }, 1000);
+    }, 100);
 });
 
 
