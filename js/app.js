@@ -7,6 +7,7 @@ import { initGallery } from './gallery.js';
 import { renderVows } from './vows.js';
 import { shootConfetti } from './confetti.js';
 import { shareOrFallback } from './share.js';
+import { initBackgroundMusic } from './music.js';
 
 
 // 1) Theming (tokens) desde data.js
@@ -128,6 +129,13 @@ renderVows({ vows: SITE.vows, mount: qs('#vows') });
 const btnStart = qs('#btn-start');
 const main = qs('#main');
 const timelineSection = qs('#timeline-section');
+
+const musicControls = initBackgroundMusic({
+    src: 'assets/music/cigarrettes.opus',
+    volume: 0.55
+});
+
+musicControls.start();
 
 // Debounce para prevenir múltiples clicks
 let isScrolling = false;
