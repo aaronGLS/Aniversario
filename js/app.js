@@ -43,6 +43,20 @@ initCountdown({
 renderTimeline({ items: SITE.timeline, mount: qs('#timeline') });
 
 
+// 5.1) Animar secciones al entrar en viewport
+const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+        }
+    });
+}, { threshold: 0.15, rootMargin: '0px 0px -80px 0px' });
+
+document.querySelectorAll('.section').forEach(section => {
+    sectionObserver.observe(section);
+});
+
+
 // 6) Carta
 initLetter({
     html: SITE.letter,
@@ -102,6 +116,31 @@ on(btnStart, 'click', async () => {
 });
 
 
+// 9.1) Parallax suave en el hero al hacer scroll (solo desktop)
+if (window.matchMedia('(min-width: 769px)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                const hero = qs('#hero');
+                if (hero) {
+                    const scrolled = window.pageYOffset;
+                    const heroHeight = hero.offsetHeight;
+                    if (scrolled < heroHeight) {
+                        const opacity = 1 - (scrolled / heroHeight) * 0.5;
+                        const translateY = scrolled * 0.3;
+                        hero.style.opacity = opacity;
+                        hero.style.transform = `translateY(${translateY}px)`;
+                    }
+                }
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+}
+
+
 // 10) Botón de compartir (si existe)
 const btnShare = qs('#btn-share');
 if (btnShare) {
@@ -115,7 +154,12 @@ if (btnShare) {
 }
 
 
-// 11) Extras opcionales (comentar si no se desean)
+// 11) Partículas flotantes de corazones en el hero
+import { initFloatingHearts } from './extras.js';
+initFloatingHearts();
+
+
+// 12) Extras opcionales (comentar si no se desean)
 // Descomenta las líneas siguientes para habilitar funcionalidades adicionales:
 /*
 import { 

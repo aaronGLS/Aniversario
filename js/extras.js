@@ -2,6 +2,101 @@
 import { qs, on, prefersReducedMotion } from './utils.js';
 
 
+// Partículas flotantes de corazones en el hero
+export function initFloatingHearts() {
+    if (prefersReducedMotion()) return;
+    
+    const hero = qs('.hero');
+    if (!hero) return;
+    
+    const hearts = ['❤️', '💕', '💖', '💗', '💓', '💝'];
+    const particlesCount = 8; // Número de partículas flotantes
+    
+    function createHeart() {
+        const heart = document.createElement('div');
+        heart.className = 'floating-heart';
+        heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+        
+        // Posición inicial aleatoria
+        const startX = Math.random() * 100;
+        const duration = 10 + Math.random() * 8; // 10-18 segundos
+        const delay = Math.random() * 5; // 0-5 segundos de delay
+        const size = 1.5 + Math.random() * 1.5; // 1.5-3rem
+        
+        heart.style.cssText = `
+            position: absolute;
+            left: ${startX}%;
+            bottom: -50px;
+            font-size: ${size}rem;
+            opacity: 0;
+            pointer-events: none;
+            filter: blur(0.5px);
+            animation: floatingUp ${duration}s ease-in-out ${delay}s infinite;
+            z-index: 0;
+        `;
+        
+        hero.appendChild(heart);
+    }
+    
+    // Crear partículas iniciales
+    for (let i = 0; i < particlesCount; i++) {
+        createHeart();
+    }
+    
+    // Agregar estilos de animación si no existen
+    if (!document.querySelector('#floating-hearts-style')) {
+        const style = document.createElement('style');
+        style.id = 'floating-hearts-style';
+        style.textContent = `
+            @keyframes floatingUp {
+                0% {
+                    bottom: -50px;
+                    opacity: 0;
+                    transform: translateX(0) rotate(0deg) scale(0.8);
+                }
+                10% {
+                    opacity: 0.6;
+                }
+                30% {
+                    transform: translateX(${Math.random() > 0.5 ? '' : '-'}${15 + Math.random() * 25}px) 
+                               rotate(${90 + Math.random() * 90}deg) 
+                               scale(${0.95 + Math.random() * 0.2});
+                }
+                50% {
+                    transform: translateX(${Math.random() > 0.5 ? '' : '-'}${20 + Math.random() * 40}px) 
+                               rotate(${180 + Math.random() * 90}deg) 
+                               scale(${0.9 + Math.random() * 0.3});
+                }
+                70% {
+                    transform: translateX(${Math.random() > 0.5 ? '' : '-'}${30 + Math.random() * 30}px) 
+                               rotate(${270 + Math.random() * 45}deg) 
+                               scale(${0.85 + Math.random() * 0.25});
+                }
+                90% {
+                    opacity: 0.5;
+                }
+                100% {
+                    bottom: 110%;
+                    opacity: 0;
+                    transform: translateX(${Math.random() > 0.5 ? '' : '-'}${50 + Math.random() * 80}px) 
+                               rotate(${360 + Math.random() * 180}deg) 
+                               scale(0.7);
+                }
+            }
+            
+            /* Respetar prefers-reduced-motion */
+            @media (prefers-reduced-motion: reduce) {
+                .floating-heart {
+                    animation: none !important;
+                    opacity: 0 !important;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
+
 // Barra de progreso de scroll
 export function initScrollProgress() {
     const progressBar = document.createElement('div');

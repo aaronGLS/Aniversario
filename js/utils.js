@@ -14,17 +14,23 @@ export function trapFocus(container) {
     function handle(e) {
         if (e.key !== 'Tab') return;
         if (e.shiftKey && document.activeElement === first) {
-            last.focus();
+            const scrollY = window.scrollY;
+            last.focus({ preventScroll: true });
+            window.scrollTo(0, scrollY);
             e.preventDefault();
         } else if (!e.shiftKey && document.activeElement === last) {
-            first.focus();
+            const scrollY = window.scrollY;
+            first.focus({ preventScroll: true });
+            window.scrollTo(0, scrollY);
             e.preventDefault();
         }
     }
 
     container.addEventListener('keydown', handle);
     trapFocus._cleanup = () => container.removeEventListener('keydown', handle);
-    first?.focus();
+    
+    // No hacer focus automático al inicio
+    // first?.focus();
 }
 trapFocus._cleanup = null;
 
@@ -38,22 +44,23 @@ export function releaseFocus() {
 let _scrollY = 0;
 export function lockBodyScroll() {
     _scrollY = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${_scrollY}px`;
-    document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
+    document.body.style.paddingRight = `${window.innerWidth - document.documentElement.clientWidth}px`;
 }
 export function unlockBodyScroll() {
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.width = '';
-    window.scrollTo(0, _scrollY);
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
 }
 
 
-// Formato de fecha local (es-ES)
+// Formato de fecha local (es-ES) - versión compacta
 export function formatDateISO(iso) {
     const d = new Date(iso);
-    return new Intl.DateTimeFormat('es-ES', { dateStyle: 'long' }).format(d);
+    return new Intl.DateTimeFormat('es-ES', { 
+        day: 'numeric', 
+        month: 'short', 
+        year: 'numeric' 
+    }).format(d);
 }
 
 

@@ -15,6 +15,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="assets/icons/heart.svg" />
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/animations-extra.css" />
     <link rel="stylesheet" href="css/print.css" media="print" />
 </head>
 
@@ -33,13 +34,14 @@
             </div>
             <button class="btn btn-primary" id="btn-start">Empezar</button>
         </div>
+        <div class="scroll-indicator" aria-hidden="true"></div>
     </header>
 
 
     <main id="main" class="main">
         <section id="timeline-section" class="section section--alt">
             <div class="container">
-                <h2 class="section__title">Nuestra historia</h2>
+                <h2 class="section__title">Nuestra historia <span class="section__badge" id="timeline-count"></span></h2>
                 <ol id="timeline" class="timeline" role="list"></ol>
             </div>
         </section>

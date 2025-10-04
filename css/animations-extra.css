@@ -1,34 +1,163 @@
 /* animations-extra.css — Animaciones y efectos adicionales opcionales */
 
-/* Partículas flotantes de corazones en el hero */
-.hero::after {
+/* Partículas flotantes de corazones en el hero - Múltiples partículas */
+.hero::after,
+.hero::before {
     content: '❤️';
     position: absolute;
     font-size: 2rem;
     opacity: 0;
-    animation: floatingHearts 15s infinite;
     pointer-events: none;
+    filter: blur(0.5px);
 }
 
-@keyframes floatingHearts {
+.hero::after {
+    animation: floatingHearts1 12s ease-in-out infinite;
+}
+
+.hero::before {
+    content: '💕';
+    animation: floatingHearts2 15s ease-in-out infinite 2s;
+}
+
+/* Contenedor para partículas adicionales */
+.hero .container::before,
+.hero .container::after {
+    content: '💖';
+    position: absolute;
+    font-size: 1.5rem;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.hero .container::before {
+    animation: floatingHearts3 18s ease-in-out infinite 4s;
+}
+
+.hero .container::after {
+    content: '💗';
+    animation: floatingHearts4 14s ease-in-out infinite 6s;
+}
+
+/* Animación 1 - Zigzag suave */
+@keyframes floatingHearts1 {
     0% {
         bottom: -50px;
         left: 10%;
         opacity: 0;
-        transform: translateX(0) rotate(0deg);
+        transform: translateX(0) rotate(0deg) scale(0.8);
+    }
+    10% {
+        opacity: 0.7;
+    }
+    50% {
+        left: 15%;
+        transform: translateX(50px) rotate(180deg) scale(1);
+    }
+    90% {
+        opacity: 0.7;
+    }
+    100% {
+        bottom: 110%;
+        left: 20%;
+        opacity: 0;
+        transform: translateX(80px) rotate(360deg) scale(0.8);
+    }
+}
+
+/* Animación 2 - Diagonal con rotación */
+@keyframes floatingHearts2 {
+    0% {
+        bottom: -50px;
+        right: 15%;
+        opacity: 0;
+        transform: translateX(0) rotate(0deg) scale(1);
     }
     10% {
         opacity: 0.6;
+    }
+    50% {
+        right: 10%;
+        transform: translateX(-30px) rotate(-180deg) scale(0.9);
     }
     90% {
         opacity: 0.6;
     }
     100% {
-        bottom: 100%;
-        left: 20%;
+        bottom: 110%;
+        right: 5%;
         opacity: 0;
-        transform: translateX(100px) rotate(360deg);
+        transform: translateX(-60px) rotate(-360deg) scale(1.1);
     }
+}
+
+/* Animación 3 - Movimiento ondulante */
+@keyframes floatingHearts3 {
+    0% {
+        bottom: -50px;
+        left: 30%;
+        opacity: 0;
+        transform: translateY(0) rotate(0deg) scale(0.7);
+    }
+    15% {
+        opacity: 0.5;
+    }
+    25% {
+        transform: translateY(-100px) translateX(20px) rotate(90deg) scale(0.9);
+    }
+    50% {
+        transform: translateY(-200px) translateX(-10px) rotate(180deg) scale(0.8);
+    }
+    75% {
+        transform: translateY(-300px) translateX(30px) rotate(270deg) scale(1);
+    }
+    85% {
+        opacity: 0.5;
+    }
+    100% {
+        bottom: 110%;
+        left: 35%;
+        opacity: 0;
+        transform: translateY(-400px) rotate(360deg) scale(0.7);
+    }
+}
+
+/* Animación 4 - Espiral */
+@keyframes floatingHearts4 {
+    0% {
+        bottom: -50px;
+        right: 30%;
+        opacity: 0;
+        transform: translateX(0) translateY(0) rotate(0deg) scale(1);
+    }
+    10% {
+        opacity: 0.6;
+    }
+    25% {
+        transform: translateX(-40px) translateY(-150px) rotate(-90deg) scale(0.8);
+    }
+    50% {
+        transform: translateX(40px) translateY(-300px) rotate(-180deg) scale(1.1);
+    }
+    75% {
+        transform: translateX(-20px) translateY(-450px) rotate(-270deg) scale(0.9);
+    }
+    90% {
+        opacity: 0.6;
+    }
+    100% {
+        bottom: 110%;
+        right: 25%;
+        opacity: 0;
+        transform: translateX(0) translateY(-600px) rotate(-360deg) scale(1);
+    }
+}
+
+/* Estilo base para partículas flotantes dinámicas */
+.floating-heart {
+    will-change: transform, opacity;
+    text-shadow: 0 2px 8px rgba(233, 30, 99, 0.4);
 }
 
 /* Efecto de brillo en el título del hero */
@@ -53,14 +182,15 @@
     }
 }
 
-/* Efecto parallax suave en las imágenes del timeline */
+/* Efecto de zoom suave con micro-interacción */
 @media (min-width: 769px) {
-    .timeline__media {
+    .timeline__item:hover .timeline__content {
+        transform: translateX(5px);
         transition: transform 0.3s ease-out;
     }
     
-    .timeline__item:hover .timeline__media {
-        transform: scale(1.05) translateZ(0);
+    .timeline__item:nth-child(even):hover .timeline__content {
+        transform: translateX(-5px);
     }
 }
 
@@ -163,27 +293,37 @@
 }
 
 /* Animación de entrada escalonada para el contador */
+.counter__unit {
+    animation: fadeInUp 0.8s cubic-bezier(0.2, 0.9, 0.2, 1) backwards;
+}
+
 .counter__unit:nth-child(1) { animation-delay: 0.4s; }
 .counter__unit:nth-child(2) { animation-delay: 0.5s; }
 .counter__unit:nth-child(3) { animation-delay: 0.6s; }
 .counter__unit:nth-child(4) { animation-delay: 0.7s; }
 
-/* Efecto de revelación en las secciones */
+/* Efecto de revelación en las secciones con IntersectionObserver */
 .section {
     opacity: 0;
-    transform: translateY(20px);
-    animation: sectionReveal 0.8s ease-out forwards;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
 
-.section:nth-of-type(1) { animation-delay: 0.2s; }
-.section:nth-of-type(2) { animation-delay: 0.4s; }
-.section:nth-of-type(3) { animation-delay: 0.6s; }
+.section.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
 
-@keyframes sectionReveal {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* Animación mejorada para títulos de sección */
+.section__title {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out 0.2s, transform 0.6s ease-out 0.2s;
+}
+
+.section.is-visible .section__title {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* Barra de progreso de scroll */
@@ -233,6 +373,16 @@
 @media (prefers-color-scheme: dark) {
     * {
         transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    /* Mejorar visibilidad de corazones en modo oscuro */
+    .floating-heart,
+    .hero::after,
+    .hero::before,
+    .hero .container::before,
+    .hero .container::after {
+        text-shadow: 0 2px 12px rgba(255, 107, 157, 0.8);
+        filter: brightness(1.2) blur(0.3px);
     }
 }
 
