@@ -1,4 +1,4 @@
-/* print.css — Estilos optimizados para impresión */
+/* print.css — Estilos básicos para impresión (funcionalidad de PDF eliminada) */
 @media print {
     @page {
         margin: 2cm;
@@ -15,51 +15,14 @@
         color: black !important;
     }
 
-    /* Ocultar todo excepto la carta */
+    /* Ocultar elementos no imprimibles */
     .hero,
-    .timeline,
-    .gallery,
-    .vows,
     .footer,
     .lightbox,
-    .btn:not(#print-letter) {
-        display: none !important;
-    }
-
-    /* Mostrar solo el panel de la carta */
-    .letter__panel {
-        position: relative !important;
-        background: white !important;
-        backdrop-filter: none !important;
-        padding: 0 !important;
-        display: block !important;
-    }
-
-    .letter__paper {
-        box-shadow: none !important;
-        max-height: none !important;
-        overflow: visible !important;
-        page-break-inside: avoid;
-        border: 2px solid #e91e63;
-        padding: 2cm !important;
-    }
-
-    .letter__paper::before {
-        display: none !important;
-    }
-
+    .btn,
+    .letter__panel,
     .letter__actions {
         display: none !important;
-    }
-
-    /* Optimizar tipografía para impresión */
-    .letter__paper p {
-        font-size: 12pt !important;
-        line-height: 1.6 !important;
-        margin-bottom: 1em !important;
-        color: black !important;
-        orphans: 3;
-        widows: 3;
     }
 
     /* Evitar saltos de página no deseados */
