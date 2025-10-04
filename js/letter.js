@@ -22,14 +22,22 @@ export function initLetter({ html, selectors }) {
         btnOpen.setAttribute('aria-expanded', 'true');
         lockBodyScroll();
         trapFocus(panel);
-        paper.focus();
+        
+        // Prevenir scroll al hacer focus
+        const scrollY = window.scrollY;
+        paper.focus({ preventScroll: true });
+        window.scrollTo(0, scrollY);
     }
     function close() {
         panel.hidden = true;
         btnOpen.setAttribute('aria-expanded', 'false');
         releaseFocus();
         unlockBodyScroll();
-        btnOpen.focus();
+        
+        // Prevenir scroll al devolver el foco
+        const scrollY = window.scrollY;
+        btnOpen.focus({ preventScroll: true });
+        window.scrollTo(0, scrollY);
     }
 
 

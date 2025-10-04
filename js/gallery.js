@@ -43,7 +43,12 @@ export function initGallery({ photos, mount, lightbox }) {
         lb.setAttribute('aria-label', `Imagen ${current + 1} de ${photos.length}`);
         lockBodyScroll();
         trapFocus(lb);
-        btnClose.focus();
+        
+        // Prevenir scroll al hacer focus
+        const scrollY = window.scrollY;
+        btnClose.focus({ preventScroll: true });
+        window.scrollTo(0, scrollY);
+        
         preloadImage(p.src).then(() => { 
             img.src = p.src; 
             img.alt = p.alt || `Foto ${current + 1}`; 
@@ -59,7 +64,10 @@ export function initGallery({ photos, mount, lightbox }) {
         releaseFocus(); 
         unlockBodyScroll(); 
         if (lastTrigger && typeof lastTrigger.focus === 'function') { 
-            lastTrigger.focus(); 
+            // Prevenir scroll al devolver el foco
+            const scrollY = window.scrollY;
+            lastTrigger.focus({ preventScroll: true }); 
+            window.scrollTo(0, scrollY);
         } 
         lastTrigger = null; 
     }
