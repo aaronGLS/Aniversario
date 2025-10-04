@@ -100,8 +100,7 @@ initLetter({
         open: '#open-letter',
         panel: '#letter-panel',
         paper: '#letter-paper',
-        close: '#close-letter',
-        print: '#print-letter'
+        close: '#close-letter'
     }
 });
 

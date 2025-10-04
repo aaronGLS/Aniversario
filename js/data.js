@@ -10,9 +10,10 @@ export const SITE = {
     palette: { primary: '#e91e63', accent: '#ffd1dc', bg: '#fff8f9', text: '#231f20' },
     letter: `
 <p>Mi amor,</p>
-<p>Gracias por este primer año lleno de risas, aprendizajes y cariño. Cada día a tu lado me confirma que quiero seguir construyendo nuestra historia.</p>
-<p>Prometo escucharte, apoyarte y celebrar cada una de tus metas. Brindo por todo lo que viene.</p>
-<p>Con amor,<br>Alex</p>
+<p>Gracias por este primer año lleno de risas, aprendizajes y cariño. Cada día a su lado me confirma que quiero seguir construyendo nuestra historia.</p>
+<p>Prometo escucharla, apoyarla y celebrar cada una de sus metas. Brindo por todo lo que viene.</p>
+<p>Recuerde que es el amor de mi vida. Será así siempre, nunca lo olvide.</p>
+<p>Con amor,<br>Aaron</p>
 `,
     timeline: [
         { date: '2024-10-03', title: 'El inicio', text: 'Dijimos sí a esta aventura.', img: 'assets/img/01-inicio.jpg', alt: 'Nuestra primera foto' },
@@ -33,6 +34,6 @@ export const SITE = {
         { src: 'assets/img/g6.jpg', alt: 'Manos entrelazadas' },
     ],
     vows: [
-        { title: 'Citas sin pantallas', text: 'Una vez por semana' },
+        { title: 'Amarnos', text: 'Para toda la vida' },
     ],
 };
